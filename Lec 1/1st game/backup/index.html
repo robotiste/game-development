@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script src="main.js"></script> -->
+    <script src="phaser.js"></script>
+    <style>
+        body{
+            margin: 0px;
+        }
+    </style>
+</head>
+<body>
+
+    <script>
+
+        var player;
+        var coin;
+        var score = 0;
+        game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.AUTO, 'first-game', {preload: preload, create: create, update: update, render: render})
+
+        function preload(){
+            game.load.image('space', 'starfield.png');
+            game.load.image('jet','jet.png');
+            game.load.image('coin','coin.png');
+        }
+
+        function create(){
+
+            game.physics.startSystem(Phaser.Physics.ARCADE)
+            space = game.add.tileSprite(0, 0, window.innerWidth, window.innerHeight, 'space');
+            player = game.add.sprite(200, 200, 'jet');
+            player.anchor.set(0.5,0.5);
+            coins = game.add.group();
+            
+            game.physics.arcade.enable(player)
+
+            for(let i = 0; i < 10; i++){
+                coin = coins.create(game.rnd.between(0, window.innerWidth), game.rnd.between(0, innerHeight), 'coin')
+                coin.anchor.set(0.5, 0.5);
+                game.physics.arcade.enable(coin)
+                coin.body.mass = -10;
+
+            }
+
+        // // what all can be added to the game
+        // console.log(game.add);
+        }
+
+        function update(){
+            // player.y = player.y + 1;
+            // player.x = game.input.x;
+            // player.y = game.input.y;
+            // player.x = game.input.x;
+            player.body.velocity.x = (game.input.x - player.x)*5;
+            player.body.velocity.y = (game.input.y - player.y)*5;
+
+            degree = Math.atan((game.input.y - player.y)/(game.input.x - player.x))*180/Math.PI
+
+            player.angle = degree;
+            space.tilePosition.y += 5;
+
+            game.physics.arcade.collide(player, coins, handler, process, this);
+
+        }
+
+        function render(){
+            game.debug.text("scores :" + score, 100, 100)
+        }
+
+        function handler(p, c){
+            return true;
+        }
+
+        function process(p, c){
+            console.log("boom")
+            score++;
+            c.x = game.rnd.between(0, window.innerWidth)
+            c.y = game.rnd.between(0, window.innerHeight)
+        }
+
+
+    </script>
+
+</body>
+</html>

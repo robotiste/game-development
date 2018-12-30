@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <script src="phaser.js"></script>
+    <style>
+        body {
+            margin: 0px;
+        }
+    </style>
+</head>
+
+
+<body>
+    <script>
+        var player_1;
+        game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.AUTO, 'first-game', { preload: preload, create: create, update: update })
+
+        // console.log(window.innerWidth)
+        // console.log(window.innerHeight)
+
+        
+        // var space;
+        function preload() {
+            game.load.image('space', 'starfield.png');
+            game.load.image('jet', 'jet.png');
+            // game.load.image('coin', 'coin.png');
+            
+        }
+        function create() {
+            game.physics.startSystem(Phaser.Physics.ARCADE)
+            space = game.add.tileSprite(0, 0, window.innerWidht, window.innerHeight, 'space');
+            
+            player_1 = game.add.sprite(500, 500, 'jet');
+            player_1.anchor.set(0.5, 0.5);
+            
+            // game.add.sprite(500, 200, 'coin');
+            // game.physics.enable(player_1, Phaser.Physics.ARCADE);
+            // image.body.velocity.y=-50;
+
+            game.physics.arcade.enable(player_1)
+            // console.log(player_1)
+        }
+        function update() {
+            // player_1.y = player_1.y - 1;
+            // player_1.x = game.input.x;
+            // player_1.y = game.input.y;
+            // space.tilePosition.x += 5;
+
+            // player_1.x = game.input.x - 20;
+            // player_1.y = game.input.y - 30;
+
+            player_1.body.velocity.x = (game.input.x - player_1.x);
+            player_1.body.velocity.y = (game.input.y - player_1.y);
+            space.tilePosition.y += 5;
+        }
+
+    </script>
+</body>
+
+
+</html>

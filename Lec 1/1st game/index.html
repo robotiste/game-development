@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script src="main.js"></script> -->
+    <script src="phaser.js"></script>
+    <style>
+        body{
+            margin: 0px;
+        }
+    </style>
+</head>
+<body>
+
+    <script>
+
+        var player;
+        var coin;
+        var score = 0;
+        var bullets;
+        var cursors;
+        game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.AUTO, 'first-game', {preload: preload, create: create, update: update, render: render})
+        var woman
+        function preload(){
+            game.load.image('space', 'starfield.png');
+            game.load.image('jet','jet.png');
+            // game.load.spritesheet('woman', 'sheet.png', 189, 206, 14);
+            game.load.image('coin','coin.png');
+            game.load.image('bomb','new.png');
+            game.load.audio('metal', ['metal.wav', 'metal.wav'])
+            game.load.audio('explosion', 'bomb.wav')
+        }
+
+        function create(){
+
+            game.physics.startSystem(Phaser.Physics.ARCADE)
+            collect = game.add.audio('metal')
+            explosion = game.add.audio('explosion')
+            space = game.add.tileSprite(0, 0, window.innerWidth, window.innerHeight, 'space');
+            player = game.add.sprite(200, 200, 'jet');
+            player.anchor.set(0.5,0);
+            player.scale.set(1.5);
+            coins = game.add.group();
+            
+                        
+            game.physics.arcade.enable(player)
+
+            for(let i = 0; i < 10; i++){
+                coin = coins.create(game.rnd.between(0, window.innerWidth), game.rnd.between(0, window.innerHeight), 'coin')
+                coin.anchor.set(0.5, 0.5);
+                game.physics.arcade.enable(coin)
+                coin.body.mass = -10;
+                // coin.body.gravity.y = -1000; //kind of accelerate coins
+            }
+
+
+            bombs = game.add.group();
+            for(let i = 0; i<5; i++){
+                bomb = bombs.create(game.rnd.between(0, window.innerWidth), game.rnd.between(0, window.innerHeight), 'bomb')
+                bomb.anchor.set(0.5, 0.5);
+                game.physics.arcade.enable(bomb)
+                bomb.body.mass = -10;
+                // bomb.scale.set(1);
+
+            }
+
+            cursors = game.input.keyboard.createCursorKeys();
+
+
+            // score_text = game.add.text(100, 100, "Score : 0", {font:"65px Arial", fill: "#ffffff"})
+
+
+            bullets = game.add.group();
+
+            // woman = game.add.sprite(200, 200, 'woman')
+            // woman.animations.play('naach')
+            // game.physics.arcade.enable(woman);
+            // woman.body.velocity.x = 50
+
+        // // what all can be added to the game
+        // console.log(game.add);
+        }
+
+        function update(){
+            // player.y = player.y + 1;
+            // player.x = game.input.x;
+            // player.y = game.input.y;
+            // player.x = game.input.x;
+            player.body.velocity.x = (game.input.x - player.x)*5;
+            player.body.velocity.y = (game.input.y - player.y)*5;
+
+            degree = Math.atan2((game.input.y - player.y), (game.input.x - player.x))*180/Math.PI + 90;
+
+            player.angle = degree;
+            space.tilePosition.y += 5;
+
+            game.physics.arcade.collide(player, coins, handler, process, this);
+            game.physics.arcade.collide(player, bombs, bomb_handler, bomb_process, this);
+            game.physics.arcade.overlap(bullets, coins, handler, process, this);
+            game.physics.arcade.overlap(bullets, bombs, bomb_handler, bomb_process, this);
+            
+        }
+
+        function render(){
+            game.debug.text("scores :" + score, 100, 100)
+            
+            bullets.children.forEach(bullet => {
+                bullet.scale.x += 0.01
+                bullet.scale.y += 0.01
+            })
+
+            if(cursors.up.isDown){
+                shoot();
+            }
+
+            // console.log(bullets);   
+
+        }
+
+        function handler(p, c){
+            return true;
+        }
+
+        function process(p, c){
+            // console.log("boom")
+            score++;
+            collect.play();
+
+            c.x = game.rnd.between(0, window.innerWidth)
+            c.y = game.rnd.between(0, window.innerHeight)
+        }
+
+        function bomb_handler(p, c){
+            return true;
+        }
+
+        function bomb_process(p, c){
+            // console.log("crash")
+            score -= 2;
+            explosion.play();
+            c.x = game.rnd.between(0, window.innerWidth)
+            c.y = game.rnd.between(0, window.innerHeight)
+        }
+
+        function shoot(){
+            bullet = bullets.create(player.x, player.y, 'coin')
+            bullet.anchor.set(0.5, 0.5)
+            game.physics.arcade.enable(bullet);
+            // bullet.body.bounce.x = 0.5
+            // bullet.body.bounce.y = 0.5
+            bullet.scale.set(0.2)
+
+            // bullet.body.mass = 1;
+            bullet.body.velocity.x = 1000*Math.cos((player.angle - 90)*Math.PI/180)
+            bullet.body.velocity.y = 1000*Math.sin((player.angle -  90)*Math.PI/180)
+            
+        }
+
+    </script>
+
+</body>
+</html>
